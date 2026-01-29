@@ -40,7 +40,7 @@ def train_val_split(
     raise NotImplementedError
 
 
-def cv_mse_poly(Xtr: np.ndarray, ytr: np.ndarray, degree: int, K: int) -> float:
+def cv_mse_poly(Xtr: np.ndarray, ytr: np.ndarray, K: int, degree: int = 3) -> float:
     """
     Perform K-fold CV on (Xtr, ytr) for polynomial regression of given degree.
 

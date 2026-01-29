@@ -86,7 +86,7 @@ def eval_linear(
     raise NotImplementedError
 
 
-def make_poly_pipeline(degree: int) -> Pipeline:
+def make_poly_pipeline(degree: int = 3) -> Pipeline:
     """
     Create a scikit-learn pipeline:
       PolynomialFeatures(degree, include_bias=False)
@@ -108,7 +108,7 @@ def fit_poly(Xtr: np.ndarray, ytr: np.ndarray, degree: int) -> Pipeline:
 
 
 def eval_poly(
-    Xtr: np.ndarray, ytr: np.ndarray, Xte: np.ndarray, yte: np.ndarray, degree: int
+    Xtr: np.ndarray, ytr: np.ndarray, Xte: np.ndarray, yte: np.ndarray, degree: int = 3
 ) -> Tuple[float, float]:
     """
     Fit polynomial regression of given degree and return (train_mse, test_mse).
