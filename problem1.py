@@ -28,7 +28,10 @@ def load_curve80(path: str) -> Tuple[np.ndarray, np.ndarray]:
     y : np.ndarray of shape (N,)
     """
     # TODO: Implement loading
-    raise NotImplementedError
+    data = np.loadtxt(path)
+    X = data[:, 0].reshape(-1, 1)
+    y = data[:, 1]
+    return X, y
 
 
 def split_data(
@@ -39,7 +42,12 @@ def split_data(
     first frac portion for train, remaining for test.
     """
     # TODO: Implement deterministic split
-    raise NotImplementedError
+    n_train = int(frac * len(X))
+    X_train = X[:n_train]
+    y_train = y[:n_train]
+    X_test = X[n_train:]
+    y_test = y[n_train:]
+    return X_train, X_test, y_train, y_test
 
 
 def shapes(
@@ -49,7 +57,7 @@ def shapes(
     Return shapes as tuples: (Xtr.shape, Xte.shape, ytr.shape, yte.shape)
     """
     # TODO: Implement
-    raise NotImplementedError
+    return Xtr.shape, Xte.shape, ytr.shape, yte.shape
 
 
 def fit_linear(Xtr: np.ndarray, ytr: np.ndarray) -> LinearRegression:
@@ -57,7 +65,9 @@ def fit_linear(Xtr: np.ndarray, ytr: np.ndarray) -> LinearRegression:
     Fit a baseline linear regression model with intercept.
     """
     # TODO: Implement training
-    raise NotImplementedError
+    model = LinearRegression(fit_intercept=True)
+    model.fit(Xtr, ytr)
+    return model
 
 
 def predict(model: Any, X: np.ndarray) -> np.ndarray:
@@ -65,7 +75,8 @@ def predict(model: Any, X: np.ndarray) -> np.ndarray:
     Return predictions as a 1D array of length N.
     """
     # TODO: Implement prediction wrapper
-    raise NotImplementedError
+    pred = model.predict(X)
+    return pred
 
 
 def mse(yhat: np.ndarray, y: np.ndarray) -> float:
@@ -73,7 +84,8 @@ def mse(yhat: np.ndarray, y: np.ndarray) -> float:
     Mean squared error.
     """
     # TODO: Implement MSE
-    raise NotImplementedError
+    err = yhat - y
+    return np.mean(err ** 2)
 
 
 def eval_linear(
@@ -83,7 +95,11 @@ def eval_linear(
     Train baseline linear regression, return (train_mse, test_mse).
     """
     # TODO: Implement evaluation
-    raise NotImplementedError
+    model = fit_linear(Xtr, ytr)
+    yhat = predict(model, Xte)
+    train_mse = mse(model.predict(Xtr), ytr)
+    test_mse = mse(yhat, yte)
+    return train_mse, test_mse
 
 
 def make_poly_pipeline(degree: int = 3) -> Pipeline:
@@ -96,7 +112,12 @@ def make_poly_pipeline(degree: int = 3) -> Pipeline:
     Returns an *unfitted* Pipeline.
     """
     # TODO: Create and return pipeline
-    raise NotImplementedError
+    pipeline = Pipeline([
+        ('poly', PolynomialFeatures(degree, include_bias=False)),
+        ('scaler', StandardScaler()),
+        ('linear', LinearRegression(fit_intercept=True))
+    ])
+    return pipeline
 
 
 def fit_poly(Xtr: np.ndarray, ytr: np.ndarray, degree: int) -> Pipeline:
@@ -104,7 +125,9 @@ def fit_poly(Xtr: np.ndarray, ytr: np.ndarray, degree: int) -> Pipeline:
     Fit the polynomial pipeline of the given degree on training data.
     """
     # TODO: Fit and return pipeline
-    raise NotImplementedError
+    model = make_poly_pipeline(degree)
+    model.fit(Xtr, ytr)
+    return model
 
 
 def eval_poly(
@@ -114,7 +137,11 @@ def eval_poly(
     Fit polynomial regression of given degree and return (train_mse, test_mse).
     """
     # TODO: Implement
-    raise NotImplementedError
+    model = fit_poly(Xtr, ytr, degree)
+    yhat = predict(model, Xte)
+    train_mse = mse(model.predict(Xtr), ytr)
+    test_mse = mse(yhat, yte)
+    return train_mse, test_mse
 
 
 def eval_degrees(
@@ -132,7 +159,13 @@ def eval_degrees(
     aligned with degrees.
     """
     # TODO: Implement
-    raise NotImplementedError
+    mse_tr = np.array([])
+    mse_te = np.array([])
+    for degree in degrees:
+        train_mse, test_mse = eval_poly(Xtr, ytr, Xte, yte, degree)
+        mse_tr = np.append(mse_tr, train_mse)
+        mse_te = np.append(mse_te, test_mse)
+    return mse_tr, mse_te
 
 
 def recommend_degree(degrees: Sequence[int], mse_te: np.ndarray) -> int:
@@ -141,4 +174,4 @@ def recommend_degree(degrees: Sequence[int], mse_te: np.ndarray) -> int:
     Break ties by returning the smaller degree.
     """
     # TODO: Implement
-    raise NotImplementedError
+    return degrees[np.argmin(mse_te)]
